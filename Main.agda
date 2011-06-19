@@ -32,14 +32,13 @@ data _⇒*_ : ∀{Γ σ} → Tm Γ σ → Tm Γ σ → Set where
     c ⇒ c' → c' ⇒* c'' → 
     c ⇒* c''
 
-
 R : {Γ : Ctx} → (σ : Ty) → Tm Γ σ → Set
 R ℕ         t = {!!}
 R Bool      t = Unit
 R (σ ⟶ τ) t = ∀ {u} → R σ u → R τ (t $ u)
 
 headexp : ∀{σ Γ} {M N : Tm Γ σ} → M ⇒ N → R σ N → R σ M
-headexp {ℕ}       p q = q
+headexp {ℕ}       p q = ?
 headexp {Bool}    p q = q
 headexp {σ ⟶ τ} p q = λ {u} p' → headexp {τ} (c p) (q {u} p')
 
