@@ -34,7 +34,7 @@ data _⇒*_ : ∀{Γ σ} → Tm Γ σ → Tm Γ σ → Set where
 
 
 R : {Γ : Ctx} → (σ : Ty) → Tm Γ σ → Set
-R ℕ         t = Unit
+R ℕ         t = {!!}
 R Bool      t = Unit
 R (σ ⟶ τ) t = ∀ {u} → R σ u → R τ (t $ u)
 
@@ -52,4 +52,6 @@ thm (var vz)     (_ , t) = t
 thm (var (vs x)) (γ , _) = thm (var x) γ
 thm (y $ y')     p       = thm y p (thm y' p)
 thm {σ = σ ⟶ τ} {γ = γ} (lam y) p = λ {u} p' → headexp (β (sub (lift _) y) u) (subst (R τ) (lemma u y) (thm {γ = γ :: u} y (p , p')))
-
+thm zero p  = {!!}
+thm (suc n) p = {!!}
+thm (rec n mz ms) p = {!!}

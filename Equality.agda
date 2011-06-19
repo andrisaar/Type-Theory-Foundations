@@ -21,6 +21,9 @@ cong f refl = refl
 cong₂ : ∀{A}{B : A → Set}{C : (x : A) → B x → Set}(f : (x : A)(y : B x) → C x y){a a' : A} → a ≡ a' → {b : B a}{b' : B a'} → b ≡ b' → f a b ≡ f a' b'
 cong₂ f refl refl = refl
 
+cong₃ : ∀{A}{B : A → Set}{C : (x : A) → B x → Set}{D : (x : A)(y : B x)(z : C x y) → Set}(f : (x : A)(y : B x)(z : C x y) → D x y z){a a' : A} → a ≡ a' → {b : B a}{b' : B a'} → b ≡ b' → {c : C a b}{c' : C a' b'} → c ≡ c' → f a b c ≡ f a' b' c'
+cong₃ f refl refl refl = refl
+
 subst : ∀{A}(P : A → Set){a a' : A} → a ≡ a' → P a → P a'
 subst P refl p = p
 
