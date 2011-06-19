@@ -16,13 +16,13 @@ data Ctx : Set where
 infixl 10 _∷_
 
 data Var : Ctx → Ty → Set where
-  vz  : ∀ {Γ σ} → Var (Γ ∷ σ) σ
-  vs_ : ∀ {Γ σ τ} → Var Γ σ → Var (Γ ∷ τ) σ 
+  vz : ∀ {Γ σ} → Var (Γ ∷ σ) σ
+  vs : ∀ {Γ σ τ} → Var Γ σ → Var (Γ ∷ τ) σ 
   
 data Tm : Ctx → Ty → Set where
-  var_ : ∀ {Γ σ} → Var Γ σ → Tm Γ σ
+  var  : ∀ {Γ σ} → Var Γ σ → Tm Γ σ
   _$_  : ∀ {Γ σ τ} → Tm Γ (σ ⟶ τ) → Tm Γ σ → Tm Γ τ
-  lam_ : ∀ {Γ σ τ} → Tm (Γ ∷ σ) τ → Tm Γ (σ ⟶ τ)
+  lam  : ∀ {Γ σ τ} → Tm (Γ ∷ σ) τ → Tm Γ (σ ⟶ τ)
   zero : ∀{Γ} → Tm Γ ℕ
   suc  : ∀{Γ} → Tm Γ ℕ → Tm Γ ℕ
   rec  : ∀{Γ σ} → Tm Γ ℕ → Tm Γ σ → Tm (Γ ∷ ℕ ∷ σ) σ → Tm Γ σ

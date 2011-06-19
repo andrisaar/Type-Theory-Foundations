@@ -38,7 +38,7 @@ R Bool      t = Unit
 R (σ ⟶ τ) t = ∀ {u} → R σ u → R τ (t $ u)
 
 headexp : ∀{σ Γ} {M N : Tm Γ σ} → M ⇒ N → R σ N → R σ M
-headexp {ℕ}       p q = ?
+headexp {ℕ}       p q = {!!}
 headexp {Bool}    p q = q
 headexp {σ ⟶ τ} p q = λ {u} p' → headexp {τ} (c p) (q {u} p')
 
