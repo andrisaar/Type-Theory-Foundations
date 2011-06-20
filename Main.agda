@@ -88,5 +88,11 @@ thm (suc n) p = rs refl⇒ (thm n p)
 thm {γ = γ} (rec n mz ms) p = snd (lem x y (λ {k} x {t} y → subst (R _) (sym (lemma3 k t γ ms)) (thm {γ = γ :: k :: t} ms ((p , x) , y)) ))
   where x = thm n p
         y = thm mz p
+
+_⇓ : ∀{σ} → Tm ∅ σ → Set 
+_⇓ {σ} t = Σ (Tm ∅ σ) λ t' → (t ⇒* t') × t' value
         
-        
+term : (t : Tm ∅ ℕ) → t ⇓
+term t with subst RN (subid t) (thm {∅}{ℕ}{γ = var} t <>)
+term t | rz p    = zero , (p , vzero)
+term t | rs p p' = suc _ , ((p , vsuc _))

@@ -114,7 +114,7 @@ hd s = s vz
 tl : ∀ {Γ Δ σ} → Sub (Γ ∷ σ) Δ → Sub Γ Δ
 tl s v = s (vs v)
 
--- we need this lemma for one place subs in beta reduction
+-- we need these two lemmas for one place subs in beta reduction
 lemma2 : ∀{Γ Δ σ u ρ} {γ : Sub Γ Δ} → (a : Var (Γ ∷ σ) ρ) → (γ :: u) a ≡ sub (subId :: u) (lift γ a)
 lemma2 vz = refl
 lemma2 {γ = γ} (vs x) = trans (cong₂ (λ f x → f x) (sym (ext subid)) refl) (sym (subren (subId :: _) vs (γ x)))
@@ -122,6 +122,8 @@ lemma2 {γ = γ} (vs x) = trans (cong₂ (λ f x → f x) (sym (ext subid)) refl
 
 lemma : ∀{Γ Δ σ τ} → (u : Tm Δ σ) → (y : Tm (Γ ∷ σ) τ) → {γ : Sub Γ Δ} → (sub (γ :: u) y) ≡  (sub (subId :: u) ∘ sub (lift γ)) y
 lemma u y {γ} = trans (cong (λ (f : Sub _ _) → sub f y) (iext λ _ → ext lemma2) ) (subcomp (subId :: u) (lift γ) y)
+
+-- we need these two for two place subs in recsuc
 
 lemma4 : ∀{Γ σ τ}{k  : Tm ∅ ℕ}{t  : Tm ∅ σ}{γ : Sub Γ ∅}(x  : Var (Γ ∷ ℕ ∷ σ) τ)
  → sub (subId :: k :: t) (lift (lift γ) x) ≡ (sub (subId :: t) (lift (γ :: k) x))
