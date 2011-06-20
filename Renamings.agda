@@ -2,6 +2,7 @@ module Renamings where
 
 open import Equality
 open import Lambda
+open import Utils
 
 Ren : Ctx → Ctx → Set
 Ren Γ Δ = ∀ {σ} → Var Γ σ → Var Δ σ 

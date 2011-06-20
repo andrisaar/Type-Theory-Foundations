@@ -3,6 +3,7 @@ module Substitutions where
 open import Equality
 open import Lambda
 open import Renamings
+open import Utils
 
 Sub : Ctx → Ctx → Set
 Sub Γ Δ = ∀{σ} → Var Γ σ → Tm Δ σ

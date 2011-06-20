@@ -2,7 +2,7 @@
 module Main where
 open import Equality
 open import Lambda
-open import Product
+open import Utils
 open Σ
 open import Renamings
 open import Substitutions
