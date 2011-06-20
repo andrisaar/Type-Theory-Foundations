@@ -4,33 +4,16 @@
 
 module Equality where
 
-data _≡_ {A : Set} : {A' : Set} → A → A' → Set where
-  refl : {a : A} → a ≡ a
-  
-infix 10 _≡_
+open import Relation.Binary.PropositionalEquality
 
-trans : ∀{A A' A''}{a : A}{a' : A'}{a'' : A''} → a ≡ a' → a' ≡ a'' → a ≡ a''
-trans refl p = p
-
-sym : ∀{A A'}{a : A}{a' : A'} → a ≡ a' → a' ≡ a
-sym refl = refl
-
-cong : ∀{A}{B : A → Set}(f : ∀ a → B a){a a' : A} → a ≡ a' → f a ≡ f a'
-cong f refl = refl
-
-cong₂ : ∀{A}{B : A → Set}{C : (x : A) → B x → Set}(f : (x : A)(y : B x) → C x y){a a' : A} → a ≡ a' → {b : B a}{b' : B a'} → b ≡ b' → f a b ≡ f a' b'
-cong₂ f refl refl = refl
-
-cong₃ : ∀{A}{B : A → Set}{C : (x : A) → B x → Set}{D : (x : A)(y : B x)(z : C x y) → Set}(f : (x : A)(y : B x)(z : C x y) → D x y z){a a' : A} → a ≡ a' → {b : B a}{b' : B a'} → b ≡ b' → {c : C a b}{c' : C a' b'} → c ≡ c' → f a b c ≡ f a' b' c'
+cong₃ : ∀{A B C D : Set}(f : A → B → C → D){x y u v p q} → 
+        x ≡ y → u ≡ v → p ≡ q →  f x u p ≡ f y v q
 cong₃ f refl refl refl = refl
 
-subst : ∀{A}(P : A → Set){a a' : A} → a ≡ a' → P a → P a'
-subst P refl p = p
+open import Level
 
-postulate ext : {A : Set}{B : A → Set}{f : ∀ a → B a}{g : ∀ a → B a} → 
-                (∀ a → f a ≡ g a) → f ≡ g
+postulate ext : Extensionality zero zero
 
 -- this could just be derived from ext
-postulate iext : {A : Set}{B : A → Set}{f : ∀ {a} → B a}{g : ∀{a} → B a} → (∀ a → f {a} ≡ g {a}) → 
-                 _≡_ { {a : A} → B a}{ {a : A} → B a} f g
-
+postulate iext : {A : Set}{B : A → Set}{f : ∀ {a} → B a}{g : ∀{a} → B a} →
+                 (∀ a → f {a} ≡ g {a}) → _≡_ {zero}{ {a : A} → B a } f g

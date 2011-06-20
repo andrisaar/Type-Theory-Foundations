@@ -1,11 +1,13 @@
 
 module Main where
+
+open import Relation.Binary.PropositionalEquality
 open import Equality
 open import Lambda
-open import Utils
-open Σ
 open import Renamings
 open import Substitutions
+open import Data.Product
+open import Data.Sum
 
 mutual
   data _value : ∀{Γ σ} → Tm Γ σ → Set where
@@ -16,9 +18,9 @@ mutual
 
 data _⇒_ : ∀{Γ σ} → Tm Γ σ → Tm Γ σ → Set where
  β    : ∀{Γ σ τ}{M : Tm (Γ ∷ σ) τ}{N : Tm Γ σ} → 
-        ((lam M) $ N) ⇒ sub₁ N M
+        ((lam M) & N) ⇒ sub₁ N M
  cong$ : ∀ {Γ σ τ} {M : Tm Γ (σ ⟶ τ)} {M' N} → M ⇒ M' →
-        (M $ N) ⇒ (M' $ N)
+        (M & N) ⇒ (M' & N)
  congsuc : ∀{Γ}{M M' : Tm Γ ℕ} → M ⇒ M' → suc M ⇒ suc M'
  congrec : ∀{Γ σ}(n n' : Tm Γ ℕ) → n ⇒ n' → 
            {mz : Tm Γ σ}{ms : Tm (Γ ∷ ℕ ∷ σ) σ} → rec n mz ms ⇒ rec n' mz ms
@@ -44,7 +46,7 @@ data RN : Tm ∅ ℕ → Set where
 R : (σ : Ty) → Tm ∅  σ → Set
 R ℕ t = RN t
 R Bool      t = Unit
-R (σ ⟶ τ) t = ∀ {u} → R σ u → R τ (t $ u)
+R (σ ⟶ τ) t = ∀ {u} → R σ u → R τ (t & u)
 
 R' : (Γ : Ctx) → Sub Γ ∅ → Set
 R' ∅       p = Unit
@@ -65,27 +67,27 @@ P n σ mz ms =  R ℕ n × R σ (rec n mz ms)
 
 closedP : ∀ {n σ mz ms} → R σ mz → 
        (∀ {k} → R ℕ k → ∀{t} → R σ t → R σ (sub (subId :: k :: t) ms)) → 
-       (n ⇒* zero) ∨ Σ (Tm ∅ ℕ) (λ n' → (n ⇒* suc n') × P n' σ mz ms)  → 
+       (n ⇒* zero) ⊎ Σ (Tm ∅ ℕ) (λ n' → (n ⇒* suc n') × P n' σ mz ms)  → 
        P n σ mz ms
-closedP p f (inl pz) = rz pz , headexp* (congrec* pz) (headexp reczero p) 
-closedP p f (inr (n' , (q , (q' , q'')))) = 
+closedP p f (inj₁ pz) = rz pz , headexp* (congrec* pz) (headexp reczero p) 
+closedP p f (inj₂ (n' , (q , (q' , q'')))) = 
   rs q q' , headexp* (congrec* q) (headexp recsuc (f q' q''))
 
 lem : ∀{σ}{n} → RN n → ∀ {mz ms} →  R σ mz → 
       (∀ {k} → R ℕ k → ∀{t} → R σ t → R σ (sub (subId :: k :: t) ms)) →  
       P n σ mz ms
-lem (rz p)    q f = closedP q f (inl p) 
-lem (rs p p') q f = closedP q f (inr (_ , (p , lem p' q f)))
+lem (rz p)    q f = closedP q f (inj₁ p) 
+lem (rs p p') q f = closedP q f (inj₂ (_ , (p , lem p' q f)))
 
 thm : ∀ {Γ σ} {γ : Sub Γ ∅} → (M : Tm Γ σ) → R' Γ γ → R σ (sub γ M)
 thm (var vz)     (_ , t) = t
 thm (var (vs x)) (γ , _) = thm (var x) γ
-thm (t $ u)     p       = thm t p (thm u p)
+thm (t & u)     p       = thm t p (thm u p)
 thm (lam t) p = λ {u} p' → 
   headexp β (subst (R _) (lemma u t) (thm t (p , p')))
 thm zero p  = rz refl⇒
 thm (suc n) p = rs refl⇒ (thm n p)
-thm (rec n mz ms) p = snd (lem x y (λ x y → 
+thm (rec n mz ms) p = proj₂ (lem x y (λ x y → 
   subst (R _) (sym (lemma3 _ _ _ ms)) (thm ms ((p , x) , y)) ))
   where x = thm n p
         y = thm mz p

@@ -1,9 +1,10 @@
 module Substitutions where
 
+open import Relation.Binary.PropositionalEquality
 open import Equality
 open import Lambda
 open import Renamings
-open import Utils
+open import Function
 
 Sub : Ctx → Ctx → Set
 Sub Γ Δ = ∀{σ} → Var Γ σ → Tm Δ σ
@@ -14,7 +15,7 @@ lift f (vs x) = ren vs (f x)
 
 sub : ∀{Γ Δ} → Sub Γ Δ → ∀{σ} → Tm Γ σ → Tm Δ σ
 sub f (var x)   = f x
-sub f (t $ u)   = (sub f t) $ (sub f u)
+sub f (t & u)   = sub f t & (sub f u)
 sub f (lam t)   = lam (sub (lift f) t)
 sub f zero      = zero
 sub f (suc n)   = suc (sub f n)
@@ -26,9 +27,6 @@ subId = var
 subComp : ∀{B Γ Δ} → Sub Γ Δ → Sub B Γ → Sub B Δ
 subComp f g = sub f ∘ g
 
--- we have now given the operations for a category of subs and a functor from there to the category of terms. Next we need to check they laws of a category and a functor
-
-
 liftwk : ∀{B Γ Δ}(f : Sub Γ Δ)(g : Ren B Γ){σ τ}(x : Var (B ∷ σ) τ) →
             (lift f ∘ wk g) x ≡ lift (f ∘ g) x
 liftwk f g vz     = refl
@@ -38,7 +36,7 @@ liftwk f g (vs x) = refl
 subren : ∀{B Γ Δ}(f : Sub Γ Δ)(g : Ren B Γ){σ}(t : Tm B σ) → 
          (sub f ∘ ren g) t ≡ sub (f ∘ g) t
 subren f g (var x)   = refl
-subren f g (t $ u)   = cong₂ _$_ (subren f g t) (subren f g u)
+subren f g (t & u)   = cong₂ _&_ (subren f g t) (subren f g u)
 subren f g (lam t)   = cong lam (trans (subren (lift f) (wk g) t)
                                        (cong (λ (f : Sub _ _) → sub f t) 
                                              (iext λ _ → ext (liftwk f g))))
@@ -56,7 +54,7 @@ renwklift f g (vs x) = trans (sym (rencomp (wk f) vs (g x)))
 rensub : ∀{B Γ Δ}(f : Ren Γ Δ)(g : Sub B Γ){σ}(t : Tm B σ) →
          (ren f ∘ sub g) t ≡ sub (ren f ∘ g) t
 rensub f g (var x) = refl
-rensub f g (t $ u) = cong₂ _$_ (rensub f g t) (rensub f g u)
+rensub f g (t & u) = cong₂ _&_ (rensub f g t) (rensub f g u)
 rensub f g (lam t) = cong lam (trans (rensub (wk f) (lift g) t) 
                                        (cong (λ (f : Sub _ _) → sub f t) 
                                              (iext λ _ → 
@@ -71,15 +69,15 @@ liftcomp f g vz     = refl
 liftcomp f g (vs x) = trans (rensub vs f (g x))
                             (sym (subren (lift f) vs (g x)))
 
-
 liftid : ∀{Γ σ τ}(x : Var (Γ ∷ σ) τ) → lift subId x ≡ subId x
 liftid vz     = refl
 liftid (vs x) = refl
 
+-- functor laws for sub
 
 subid : ∀{Γ σ}(t : Tm Γ σ) → sub subId t ≡ id t
 subid (var x)   = refl
-subid (t $ u)   = cong₂ _$_ (subid t) (subid u)
+subid (t & u)   = cong₂ _&_ (subid t) (subid u)
 subid (lam t)   = cong lam (trans (cong (λ (f : Sub _ _) → sub f t) 
                                         (iext λ _ → ext liftid)) 
                                   (subid t))
@@ -87,11 +85,10 @@ subid zero      = refl
 subid (suc n)   = cong suc (subid n)
 subid (rec n mz ms) = cong₃ rec (subid n) (subid mz) (trans (cong (λ (f : Sub _ _) → sub f ms) (iext λ _ → ext (λ x → trans (cong (λ (f : Sub _ _) → lift f x) (iext λ _ → ext liftid)) (liftid x)))) (subid ms))
 
-
 subcomp : ∀{B Γ Δ}(f : Sub Γ Δ)(g : Sub B Γ){σ}(t : Tm B σ) → 
           sub (subComp f g) t ≡ (sub f ∘ sub g) t
 subcomp f g (var x) = refl
-subcomp f g (t $ u) = cong₂ _$_ (subcomp f g t) (subcomp f g u) 
+subcomp f g (t & u) = cong₂ _&_ (subcomp f g t) (subcomp f g u) 
 subcomp f g (lam t) = cong lam (trans (cong (λ (f : Sub _ _) → sub f t) (iext λ _ → ext (liftcomp f g))) (subcomp (lift f) (lift g) t)) 
 subcomp f g zero = refl
 subcomp f g (suc n) = cong suc (subcomp f g n)

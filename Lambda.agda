@@ -21,7 +21,7 @@ data Var : Ctx → Ty → Set where
   
 data Tm : Ctx → Ty → Set where
   var  : ∀ {Γ σ} → Var Γ σ → Tm Γ σ
-  _$_  : ∀ {Γ σ τ} → Tm Γ (σ ⟶ τ) → Tm Γ σ → Tm Γ τ
+  _&_  : ∀ {Γ σ τ} → Tm Γ (σ ⟶ τ) → Tm Γ σ → Tm Γ τ
   lam  : ∀ {Γ σ τ} → Tm (Γ ∷ σ) τ → Tm Γ (σ ⟶ τ)
   zero : ∀{Γ} → Tm Γ ℕ
   suc  : ∀{Γ} → Tm Γ ℕ → Tm Γ ℕ
