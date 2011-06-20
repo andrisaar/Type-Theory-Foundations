@@ -102,6 +102,8 @@ _::_ : ∀{Γ Δ σ} → Sub Γ Δ → Tm Δ σ → Sub (Γ ∷ σ) Δ
 (f :: t) vz = t
 (f :: t) (vs y) = f y
 
+infixl 10 _::_
+
 sub₁ : ∀{Γ σ τ} → Tm Γ σ → Tm (Γ ∷ σ) τ → Tm Γ τ
 sub₁ N M = sub (subId :: N) M
 
@@ -119,3 +121,12 @@ lemma2 {γ = γ} (vs x) = trans (cong₂ (λ f x → f x) (sym (ext subid)) refl
 
 lemma : ∀{Γ Δ σ τ} → (u : Tm Δ σ) → (y : Tm (Γ ∷ σ) τ) → {γ : Sub Γ Δ} → (sub (γ :: u) y) ≡  (sub (subId :: u) ∘ sub (lift γ)) y
 lemma u y {γ} = trans (cong (λ (f : Sub _ _) → sub f y) (iext λ _ → ext lemma2) ) (subcomp (subId :: u) (lift γ) y)
+
+lemma4 : ∀{Γ σ τ}{k  : Tm ∅ ℕ}{t  : Tm ∅ σ}{γ : Sub Γ ∅}(x  : Var (Γ ∷ ℕ ∷ σ) τ)
+ → sub (subId :: k :: t) (lift (lift γ) x) ≡ (sub (subId :: t) (lift (γ :: k) x))
+lemma4 vz     = refl
+lemma4 {_}{_}{_}{k}{t}{γ}(vs x) = trans (trans (subren (subId :: k :: t) vs_ (lift γ x)) (trans (sym (lemma2 x)) (sym (subid ((γ :: k) x))))) (sym (subren (subId :: t) vs_ ((γ :: k) x)))
+
+
+lemma3 : ∀{Γ σ}(k : Tm ∅ ℕ)(t : Tm ∅ σ)(γ : Sub Γ ∅)(ms : Tm (Γ ∷ ℕ ∷ σ) σ) → (sub (subId :: k :: t) (sub (lift (lift γ)) ms)) ≡ (sub (γ :: k :: t) ms)
+lemma3 k t γ ms = trans (sym (subcomp (subId :: k :: t) (lift (lift γ)) ms)) (cong (λ (f : Sub _ _) → sub f ms) (iext λ _ → ext (λ x → trans (lemma4 x) (sym (lemma2 {γ = γ :: k} x)))))
