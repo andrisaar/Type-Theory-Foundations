@@ -33,7 +33,7 @@ rencomp : ∀ {B Γ Δ}(f : Ren Γ Δ)(g : Ren B Γ){σ}(t : Tm B σ) →
             ren (renComp f g) t ≡ (ren f ∘ ren g) t
 rencomp f g (var x) = refl
 rencomp f g (t $ u) = cong₂ _$_ (rencomp f g t) (rencomp f g u)
-rencomp f g (lam t) = cong lam_ (trans (cong (λ (f : Ren _ _) → ren f t)
+rencomp f g (lam t) = cong lam (trans (cong (λ (f : Ren _ _) → ren f t)
                                               (iext λ _ → ext (wkcomp f g)))
                                         (rencomp (wk f) (wk g) t))
 rencomp f g zero = refl

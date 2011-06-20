@@ -46,7 +46,16 @@ R ℕ t = RN t
 R Bool      t = Unit
 R (σ ⟶ τ) t = ∀ {u} → R σ u → R τ (t $ u)
 
+<<<<<<< HEAD
 R' : (Γ : Ctx) → Sub Γ ∅ → Set
+=======
+headexp : ∀{σ Γ} {M N : Tm Γ σ} → M ⇒ N → R σ N → R σ M
+headexp {ℕ}       p q = {!!}
+headexp {Bool}    p q = q
+headexp {σ ⟶ τ} p q = λ {u} p' → headexp {τ} (c p) (q {u} p')
+
+R' : (Γ : Ctx) → {Δ : Ctx} → Sub Γ Δ → Set
+>>>>>>> ad49426739f249fd531310549b9fcbeacbcf51f8
 R' ∅       p = Unit
 R' (Γ ∷ σ) p = R' Γ (tl p) × R σ (hd p)
 
