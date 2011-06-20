@@ -1,7 +1,3 @@
---
--- Propositional equality, James' flavour, mostly stolen from his previous work
---
-
 module Equality where
 
 open import Relation.Binary.PropositionalEquality

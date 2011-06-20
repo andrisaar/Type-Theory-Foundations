@@ -1,4 +1,4 @@
-module Lambda where
+module Terms where
 open import Equality
 
 data Unit : Set where

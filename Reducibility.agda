@@ -1,9 +1,9 @@
 
-module Main where
+module Reducibility where
 
 open import Relation.Binary.PropositionalEquality
 open import Equality
-open import Lambda
+open import Terms
 open import Renamings
 open import Substitutions
 open import Data.Product
