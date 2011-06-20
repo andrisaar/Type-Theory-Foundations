@@ -130,6 +130,5 @@ lemma4 : ∀{Γ σ τ}{k  : Tm ∅ ℕ}{t  : Tm ∅ σ}{γ : Sub Γ ∅}(x  : Va
 lemma4 vz     = refl
 lemma4 {_}{_}{_}{k}{t}{γ}(vs x) = trans (trans (subren (subId :: k :: t) vs (lift γ x)) (trans (sym (lemma2 x)) (sym (subid ((γ :: k) x))))) (sym (subren (subId :: t) vs ((γ :: k) x)))
 
-
 lemma3 : ∀{Γ σ}(k : Tm ∅ ℕ)(t : Tm ∅ σ)(γ : Sub Γ ∅)(ms : Tm (Γ ∷ ℕ ∷ σ) σ) → (sub (subId :: k :: t) (sub (lift (lift γ)) ms)) ≡ (sub (γ :: k :: t) ms)
 lemma3 k t γ ms = trans (sym (subcomp (subId :: k :: t) (lift (lift γ)) ms)) (cong (λ (f : Sub _ _) → sub f ms) (iext λ _ → ext (λ x → trans (lemma4 x) (sym (lemma2 {γ = γ :: k} x)))))

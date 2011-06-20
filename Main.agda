@@ -80,19 +80,20 @@ lem (rs p p') q f = closedP q f (inr (_ , (p , lem p' q f)))
 thm : ∀ {Γ σ} {γ : Sub Γ ∅} → (M : Tm Γ σ) → R' Γ γ → R σ (sub γ M)
 thm (var vz)     (_ , t) = t
 thm (var (vs x)) (γ , _) = thm (var x) γ
-thm (y $ y')     p       = thm y p (thm y' p)
-thm {σ = σ ⟶ τ} {γ = γ} (lam y) p = λ {u} p' → 
-  headexp β (subst (R τ) (lemma u y) (thm {γ = γ :: u} y (p , p')))
+thm (t $ u)     p       = thm t p (thm u p)
+thm (lam t) p = λ {u} p' → 
+  headexp β (subst (R _) (lemma u t) (thm t (p , p')))
 thm zero p  = rz refl⇒
 thm (suc n) p = rs refl⇒ (thm n p)
-thm {γ = γ} (rec n mz ms) p = snd (lem x y (λ {k} x {t} y → subst (R _) (sym (lemma3 k t γ ms)) (thm {γ = γ :: k :: t} ms ((p , x) , y)) ))
+thm (rec n mz ms) p = snd (lem x y (λ x y → 
+  subst (R _) (sym (lemma3 _ _ _ ms)) (thm ms ((p , x) , y)) ))
   where x = thm n p
         y = thm mz p
 
 _⇓ : ∀{σ} → Tm ∅ σ → Set 
 _⇓ {σ} t = Σ (Tm ∅ σ) λ t' → (t ⇒* t') × t' value
-        
+      
 term : (t : Tm ∅ ℕ) → t ⇓
-term t with subst RN (subid t) (thm {∅}{ℕ}{γ = var} t <>)
+term t with subst RN (subid t) (thm {∅}{ℕ}{subId} t <>)
 term t | rz p    = zero , (p , vzero)
 term t | rs p p' = suc _ , ((p , vsuc _))
