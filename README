@@ -1,0 +1,56 @@
+This is a formalisation in Coq of some of the material presented by
+Bob Harper at OPLSS 2011.
+
+It is developed by James Chapman and Andri Saar with the aid of some
+useful discussion about with Taus Brock-Nannestad and Filip
+Sieczkowski. https://github.com/finrod/System-T for Filip's
+formalisation in Coq.
+
+Terms.agda
+==========
+
+This file contains the term syntax of system T. It is indexed by
+contexts and types in is hence guaranteed to be well-scoped and
+well-typed. Variables are represented as de Bruijn indices. You can
+read them as natural numbers but are guaranteed not to point out of
+scope and also carry their type.
+
+Renamings.agda
+============== 
+
+This file contains the renaming operations on terms and associated
+lemmas. We need this as we use it in our definition of
+substitution. Renamings are represented as functions from sets
+variables to sets of variables. The benefit of this functional
+representation (as opposed to a first order one) is that we get some
+stuff for free, we don't need to prove left and right identity and
+associativity of renamings as they hold definitionally. The downside
+is that when we do need to reason about renamings we need to use
+extensionality.
+
+
+Substitutions.agda
+==================
+
+This file contains the substitution operations and associated
+lemmas. Like renamings we represent substitutions as functions, this
+time from variables to terms.
+
+Equality.agda
+=============
+
+This file contains one utility function (congruence of ternary
+functions) that I couldn't find in the standard library that we need
+and also postulates extensionality.
+
+Reducibility.agda
+=================
+
+This file contains the guts of the proof. It is very close to what Bob
+presented I think. In fact, because we are working in Agda we can
+simplify things a bit. We don't need to worry about the properties of
+the reducibility predicate on natural numbers. It is an inductive
+definition so we get what we need for free. We also avoid the
+predicate P and its closure, probably for the same reason.
+
+James
