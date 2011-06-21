@@ -62,22 +62,11 @@ headexp* : ∀{σ} {M N : Tm ∅ σ} → M ⇒* N → R σ N → R σ M
 headexp* refl⇒ q = q
 headexp* (trans⇒ p p') q = headexp p (headexp* p' q)
 
-P : (n : Tm ∅ ℕ)(σ : Ty)(mz : Tm ∅ σ)(ms : Tm (∅ ∷ ℕ ∷ σ) σ) → Set
-P n σ mz ms =  R ℕ n × R σ (rec n mz ms)
-
-closedP : ∀ {n σ mz ms} → R σ mz → 
-       (∀ {k} → R ℕ k → ∀{t} → R σ t → R σ (sub (subId :: k :: t) ms)) → 
-       (n ⇒* zero) ⊎ Σ (Tm ∅ ℕ) (λ n' → (n ⇒* suc n') × P n' σ mz ms)  → 
-       P n σ mz ms
-closedP p f (inj₁ pz) = rz pz , headexp* (congrec* pz) (headexp reczero p) 
-closedP p f (inj₂ (n' , (q , (q' , q'')))) = 
-  rs q q' , headexp* (congrec* q) (headexp recsuc (f q' q''))
-
 lem : ∀{σ}{n} → RN n → ∀ {mz ms} →  R σ mz → 
       (∀ {k} → R ℕ k → ∀{t} → R σ t → R σ (sub (subId :: k :: t) ms)) →  
-      P n σ mz ms
-lem (rz p)    q f = closedP q f (inj₁ p) 
-lem (rs p p') q f = closedP q f (inj₂ (_ , (p , lem p' q f)))
+      R σ (rec n mz ms)
+lem (rz p)    q f = headexp* (congrec* p) (headexp reczero q)
+lem (rs p p') q f = headexp* (congrec* p) (headexp recsuc (f p' (lem p' q f)))
 
 thm : ∀ {Γ σ} {γ : Sub Γ ∅} → (M : Tm Γ σ) → R' Γ γ → R σ (sub γ M)
 thm (var vz)     (_ , t) = t
@@ -87,10 +76,7 @@ thm (lam t) p = λ {u} p' →
   headexp β (subst (R _) (lemma u t) (thm t (p , p')))
 thm zero p  = rz refl⇒
 thm (suc n) p = rs refl⇒ (thm n p)
-thm (rec n mz ms) p = proj₂ (lem x y (λ x y → 
-  subst (R _) (sym (lemma3 _ _ _ ms)) (thm ms ((p , x) , y)) ))
-  where x = thm n p
-        y = thm mz p
+thm (rec n mz ms) p = lem (thm n p) (thm mz p) λ x y → subst (R _) (sym (lemma3 _ _ _ ms)) (thm ms ((p , x) , y))
 
 _⇓ : ∀{σ} → Tm ∅ σ → Set 
 _⇓ {σ} t = Σ (Tm ∅ σ) λ t' → (t ⇒* t') × t' value
