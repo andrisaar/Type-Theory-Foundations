@@ -36,6 +36,16 @@ This file contains the substitution operations and associated
 lemmas. Like renamings we represent substitutions as functions, this
 time from variables to terms.
 
+The renaming and substitution machinery was developed in the paper
+"Relative monads formalised". See my webpage for a draft
+http://www.cs.ioc.ee/~james/Publications.html. The particular
+representation was chosen as it corresponds exactly to 'bind' of the
+relative monad given by the typed lambda terms. The lemmas proven are
+those necessary to check the (relative) monad laws. Substitutions are
+Kleisli maps and the EM algebras are evaluators (models) which I think is
+pretty cool.
+
+
 Equality.agda
 =============
 
